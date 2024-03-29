@@ -2,7 +2,9 @@
 
 PollD is a dApp that allows users to create polls with an unlimited amount of options to choose from. PollD only allows for a single option to be selected for each poll and a user (wallet) can only vote once.
 
-You can interact with the `PollDApp` smart contract with the following functions:
+To view the deployed contract, visit [Etherscan (Sepolia)](https://sepolia.etherscan.io/address/0x18654a89b03ed072474cd79d4d10def09117a169).
+
+You can interact with the `PollDApp` smart contract using the following functions:
 
 ### Call
 - `pollCount()`: Returns the total amount of polls and the last PollID used.
