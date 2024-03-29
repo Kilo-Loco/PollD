@@ -1,21 +1,55 @@
-## Foundry
+## PollD
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+PollD is a dApp that allows users to create polls with an unlimited amount of options to choose from. PollD only allows for a single option to be selected for each poll and a user (wallet) can only vote once.
 
-Foundry consists of:
+You can interact with the `PollDApp` smart contract with the following functions:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### Call
+- `pollCount()`: Returns the total amount of polls and the last PollID used.
+- `getPoll(uint)(uint,address,string,uint)`: Used to get a Poll by its ID.
+- `pollResults(uint)(PollOption[])`: Used to get the vote count for each option of the provided PollID.
 
-## Documentation
+### Send
+- `createPoll(string,string[])`: Creates a Poll given the question and an array of options to choose from.
+- `vote(uint256,uint256)`: Allows a user to vote given the PollID and the option index.
 
-https://book.getfoundry.sh/
+<details>
+<summary>Structures</summary>
+
+```solidity
+struct PollOption {
+    uint pollId;
+    uint optionIndex;
+    string title;
+    uint voteCount;
+}
+```
+
+```solidity
+struct Poll {
+    uint id;
+    address creator;
+    string question;
+    uint optionCount;
+    mapping(uint => PollOption) options;
+    mapping(address => bool) addressDidVoteMap;
+}
+```
+</details>
 
 ## Usage
 
+You can use Foundry to build, test, interact, and deploy PollD.
+
 ### Build
+
+Foundryup must be running to build the project:
+
+```shell
+$ foundryup
+```
+
+In the root directory of the project, run the following command to compile the project:
 
 ```shell
 $ forge build
@@ -27,40 +61,48 @@ $ forge build
 $ forge test
 ```
 
-### Format
+### Interaction
 
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
+Use Anvil to create a local testnet node:
 ```shell
 $ anvil
 ```
 
+#### Example Send
+```shell
+$ cast send <CONTRACT_ADDRESS>\
+    "createPoll(string,string[])" "Favorite color?" "['red','blue','yellow']"\
+    --rpc-url <RPC_URL>\
+    --account <ERC_2335_KEY>
+```
+
+#### Example Call
+```shell
+$ cast call <CONTRACT_ADDRESS>\
+    "getPoll(uint)(uint,address,string,uint)" 1
+```
+
+<details>
+<summary>Create ERC-2335 Key</summary>
+
+```bash
+$ cast wallet import <KEY_NAME> --private-key <WALLET_PRIVATE_KEY>
+```
+</details>
+
 ### Deploy
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ forge script script/DeployPollDApp.s.sol\
+    --rpc-url <RPC_URL>\
+    --broadcast\
+    --account <ERC_2335_KEY>\
+    --sender  <WALLET_ADDRESS>
 ```
 
-### Cast
+## Requirements
 
+To install [Foundryup](https://book.getfoundry.sh/getting-started/installation#using-foundryup), run the following command in your terminal:
 ```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+$ curl -L https://foundry.paradigm.xyz | bash
 ```
