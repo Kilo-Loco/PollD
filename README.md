@@ -7,16 +7,15 @@ To view the deployed contract, visit [Etherscan (Sepolia)](https://sepolia.ether
 You can interact with the `PollDApp` smart contract using the following functions:
 
 ### Call
-- `pollCount()`: Returns the total amount of polls and the last PollID used.
-- `getPoll(uint)(uint,address,string,uint)`: Used to get a Poll by its ID.
-- `pollResults(uint)(PollOption[])`: Used to get the vote count for each option of the provided PollID.
+- `getPollCount()`: Returns the total amount of polls and the last PollID used.
+- `getPoll(uint)(PollResponse)`: Get relevant information of a Poll by its ID.
 
 ### Send
 - `createPoll(string,string[])`: Creates a Poll given the question and an array of options to choose from.
 - `vote(uint256,uint256)`: Allows a user to vote given the PollID and the option index.
 
 <details>
-<summary>Structures</summary>
+<summary>Response Structures</summary>
 
 ```solidity
 struct PollOption {
@@ -25,16 +24,12 @@ struct PollOption {
     string title;
     uint voteCount;
 }
-```
 
-```solidity
-struct Poll {
+struct PollResponse {
     uint id;
     address creator;
     string question;
-    uint optionCount;
-    mapping(uint => PollOption) options;
-    mapping(address => bool) addressDidVoteMap;
+    PollOption[] options;
 }
 ```
 </details>
