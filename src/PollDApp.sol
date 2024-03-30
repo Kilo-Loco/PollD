@@ -1,44 +1,46 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import {Poll, PollOption, PollResponse} from "./Models.sol";
+
 contract PollDApp {
-    struct PollOption {
-        uint pollId;
-        uint optionIndex;
-        string title;
-        uint voteCount;
-    }
-
-    struct Poll {
-        uint id;
-        address creator;
-        string question;
-        uint optionCount;
-        mapping(uint => PollOption) options;
-        mapping(address => bool) addressDidVoteMap;
-    }
-
     error InvalidOptionCount();
     error InvalidPoll();
     error InvalidPollOption();
     error CannotVoteAgain();
 
-    uint public pollCount;
-    mapping(uint => Poll) polls;
+    uint private s_pollCount;
+    mapping(uint => Poll) private s_polls;
+
+    modifier validatePoll(uint _pollId) {
+        if (_pollId > s_pollCount) {
+            revert InvalidPoll();
+        }
+        _;
+    }
+
+    function getPollCount() external view returns (uint) {
+        return s_pollCount;
+    }
 
     function getPoll(
         uint _pollId
-    ) external view returns (uint, address, string memory, uint) {
-        if (_pollId > pollCount) {
-            revert InvalidPoll();
-        }
+    ) external view validatePoll(_pollId) returns (PollResponse memory) {
+        Poll storage poll = s_polls[_pollId];
 
-        return (
-            polls[_pollId].id,
-            polls[_pollId].creator,
-            polls[_pollId].question,
-            polls[_pollId].optionCount
+        PollOption[] memory options = new PollOption[](
+            s_polls[_pollId].optionCount
         );
+        for (uint i = 0; i < s_polls[_pollId].optionCount; i++) {
+            options[i] = s_polls[_pollId].options[i];
+        }
+        PollResponse memory response = PollResponse(
+            poll.id,
+            poll.creator,
+            poll.question,
+            options
+        );
+        return response;
     }
 
     function createPoll(
@@ -49,17 +51,18 @@ contract PollDApp {
             revert InvalidOptionCount();
         }
 
-        pollCount++;
+        s_pollCount++;
+        uint newPollId = s_pollCount;
 
-        Poll storage newPoll = polls[pollCount];
-        newPoll.id = pollCount;
+        Poll storage newPoll = s_polls[newPollId];
+        newPoll.id = newPollId;
         newPoll.creator = msg.sender;
         newPoll.question = _question;
         newPoll.optionCount = _options.length;
 
         for (uint i = 0; i < _options.length; i++) {
             PollOption memory _newPollOption = PollOption(
-                pollCount,
+                newPollId,
                 i,
                 _options[i],
                 0
@@ -68,34 +71,30 @@ contract PollDApp {
         }
     }
 
-    function vote(uint _pollId, uint _optionIndex) external {
-        if (_pollId > pollCount) {
-            revert InvalidPoll();
-        }
-        if (_optionIndex >= polls[_pollId].optionCount) {
+    function vote(
+        uint _pollId,
+        uint _optionIndex
+    ) external validatePoll(_pollId) {
+        if (_optionIndex >= s_polls[_pollId].optionCount) {
             revert InvalidPollOption();
         }
-        if (polls[_pollId].addressDidVoteMap[msg.sender]) {
+        if (s_polls[_pollId].addressDidVoteMap[msg.sender]) {
             revert CannotVoteAgain();
         }
 
-        polls[_pollId].options[_optionIndex].voteCount++;
-        polls[_pollId].addressDidVoteMap[msg.sender] = true;
+        s_polls[_pollId].options[_optionIndex].voteCount++;
+        s_polls[_pollId].addressDidVoteMap[msg.sender] = true;
     }
 
-    function pollResults(
-        uint _pollId
-    ) external view returns (PollOption[] memory) {
-        if (_pollId > pollCount) {
-            revert InvalidPoll();
-        }
-
-        PollOption[] memory pollOptions = new PollOption[](
-            polls[_pollId].optionCount
-        );
-        for (uint i = 0; i < polls[_pollId].optionCount; i++) {
-            pollOptions[i] = polls[_pollId].options[i];
-        }
-        return pollOptions;
-    }
+    // function pollResults(
+    //     uint _pollId
+    // ) external view validatePoll(_pollId) returns (PollOption[] memory) {
+    //     PollOption[] memory pollOptions = new PollOption[](
+    //         s_polls[_pollId].optionCount
+    //     );
+    //     for (uint i = 0; i < s_polls[_pollId].optionCount; i++) {
+    //         pollOptions[i] = s_polls[_pollId].options[i];
+    //     }
+    //     return pollOptions;
+    // }
 }
