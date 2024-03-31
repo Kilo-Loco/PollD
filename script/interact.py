@@ -17,21 +17,26 @@ def request_erc_2335_key(args):
 
 def get_poll_count(args):
     contract_address = request_contract_address(args)
+    rpc_url = request_rpc_url(args)
 
     command = (
         f'cast call {contract_address} '
-        f'"getPollCount()(uint)"'
+        f'"getPollCount()(uint)" '
+        f'--rpc-url {rpc_url}'
     )
     execute_command(command)
 
 def get_poll(args):
     contract_address = request_contract_address(args)
+    rpc_url = request_rpc_url(args)
     poll_id = request_poll_id(args)
 
     command = (
         f'cast call {contract_address} '
-        f'"getPoll(uint)((uint,address,string,(uint,uint,string,uint)[]))" {poll_id}'
+        f'"getPoll(uint)((uint,address,string,(uint,uint,string,uint)[]))" {poll_id} '
+        f'--rpc-url {rpc_url}'
     )
+    print(command)
     execute_command(command)
 
 def create_poll(args):
@@ -61,9 +66,9 @@ def create_poll(args):
 
 def vote(args):
     contract_address = request_contract_address(args)
-    poll_id = request_poll_id(args)
     rpc_url = request_rpc_url(args)
     erc_2335_key = request_erc_2335_key(args)
+    poll_id = request_poll_id(args)
     choice = args.choice if args.choice else input("Enter your vote (option index): ")
 
     command = (
@@ -105,12 +110,14 @@ def main():
     # get-poll-count with optional arguments
     get_poll_count_parser = subparsers.add_parser('get-poll-count', help='Returns the total amount of polls and the last PollID used')
     get_poll_count_parser.add_argument('contract_address', nargs='?', help='Contract address')
+    get_poll_count_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
     get_poll_count_parser.set_defaults(func=get_poll_count)
 
     # get-poll with optional arguments
     get_poll_parser = subparsers.add_parser('get-poll', help='Get details of a poll')
     get_poll_parser.add_argument('contract_address', nargs='?', help='Contract address')
     get_poll_parser.add_argument('poll_id', nargs='?', type=int, help='Poll ID')
+    get_poll_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
     get_poll_parser.set_defaults(func=get_poll)
 
     # create-poll with optional arguments
