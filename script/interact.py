@@ -74,6 +74,20 @@ def vote(args):
     )
     execute_command(command)
 
+def deploy(args):
+    rpc_url = request_rpc_url(args)
+    erc_2335_key = request_erc_2335_key(args)
+    wallet_address = args.wallet_address if args.wallet_address else input("Enter the wallet address: ")
+
+    command = (
+        f'forge script script/DeployPollDApp.s.sol '
+        f'--rpc-url {rpc_url} '
+        f'--broadcast '
+        f'--account {erc_2335_key} '
+        f'--sender {wallet_address}'
+    )
+    execute_command(command)
+
 def execute_command(command):
     args = shlex.split(command)
     result = subprocess.run(args, capture_output=True, text=True)
@@ -115,6 +129,12 @@ def main():
     vote_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
     vote_parser.add_argument('erc_2335_key', nargs='?', help='ERC-2335 key')
     vote_parser.set_defaults(func=vote)
+
+    deploy_parser = subparsers.add_parser('deploy', help='Deploy the DApp')
+    deploy_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
+    deploy_parser.add_argument('erc_2335_key', nargs='?', help='ERC-2335 key')
+    deploy_parser.add_argument('wallet_address', nargs='?', help='Wallet address')
+    deploy_parser.set_defaults(func=deploy)
 
     args = parser.parse_args()
 
