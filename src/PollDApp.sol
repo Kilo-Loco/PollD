@@ -85,16 +85,4 @@ contract PollDApp {
         s_polls[_pollId].options[_optionIndex].voteCount++;
         s_polls[_pollId].addressDidVoteMap[msg.sender] = true;
     }
-
-    // function pollResults(
-    //     uint _pollId
-    // ) external view validatePoll(_pollId) returns (PollOption[] memory) {
-    //     PollOption[] memory pollOptions = new PollOption[](
-    //         s_polls[_pollId].optionCount
-    //     );
-    //     for (uint i = 0; i < s_polls[_pollId].optionCount; i++) {
-    //         pollOptions[i] = s_polls[_pollId].options[i];
-    //     }
-    //     return pollOptions;
-    // }
 }
