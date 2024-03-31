@@ -15,3 +15,5 @@ get-poll:; python3 script/interact.py get-poll
 create-poll:; python3 script/interact.py create-poll
 
 vote:; python3 script/interact.py vote
+
+deploy:; python3 script/interact.py deploy

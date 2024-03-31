@@ -36,31 +36,99 @@ struct PollResponse {
 
 ## Usage
 
-You can use Foundry to build, test, interact, and deploy PollD.
+To easily interact with PollD, you can use the make commands located in the [Makefile](./Makefile).
+
+You can also interact with the contract directly from Foundry. Those examples will be listed in dropdowns.
 
 ### Build
 
 Foundryup must be running to build the project:
 
 ```shell
-$ foundryup
+$ make start
 ```
 
 In the root directory of the project, run the following command to compile the project:
 
 ```shell
+$ make build
+```
+
+<details>
+<summary>Build using Foundry</summary>
+
+```shell
+$ foundryup
+```
+
+```shell
 $ forge build
 ```
+</details>
 
 ### Test
 
 ```shell
+$ make test
+```
+
+<details>
+<summary>Test using Foundry</summary>
+
+```shell
 $ forge test
 ```
+</details>
+
+### Deploy
+
+```shell
+$ make deploy
+```
+
+<details>
+<summary>Deploy using Foundry</summary>
+
+```shell
+$ forge script script/DeployPollDApp.s.sol\
+    --rpc-url <RPC_URL>\
+    --broadcast\
+    --account <ERC_2335_KEY>\
+    --sender  <WALLET_ADDRESS>
+```
+</details>
 
 ### Interaction
 
-Use Anvil to create a local testnet node:
+Create a local testnet node:
+
+```shell
+$ make local-chain
+```
+
+#### Get Poll Count
+```shell
+$ make get-poll-count
+```
+
+#### Get A Poll
+```shell
+$ make get-poll
+```
+
+#### Create A Poll
+```shell
+$ make create-poll
+```
+
+#### Vote On A Poll
+```shell
+$ make vote
+```
+
+<details>
+<summary>Interact using Foundry</summary>
+
 ```shell
 $ anvil
 ```
@@ -78,6 +146,7 @@ $ cast send <CONTRACT_ADDRESS>\
 $ cast call <CONTRACT_ADDRESS>\
     "getPoll(uint)(uint,address,string,uint)" 1
 ```
+</details>
 
 <details>
 <summary>Create ERC-2335 Key</summary>
@@ -87,19 +156,16 @@ $ cast wallet import <KEY_NAME> --private-key <WALLET_PRIVATE_KEY>
 ```
 </details>
 
-### Deploy
-
-```shell
-$ forge script script/DeployPollDApp.s.sol\
-    --rpc-url <RPC_URL>\
-    --broadcast\
-    --account <ERC_2335_KEY>\
-    --sender  <WALLET_ADDRESS>
-```
-
 ## Requirements
 
 To install [Foundryup](https://book.getfoundry.sh/getting-started/installation#using-foundryup), run the following command in your terminal:
+
+```shell
+$ make install-foundry
+```
+
+OR
+
 ```shell
 $ curl -L https://foundry.paradigm.xyz | bash
 ```
