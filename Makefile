@@ -17,3 +17,5 @@ create-poll:; python3 script/interact.py create-poll
 vote:; python3 script/interact.py vote
 
 deploy:; python3 script/interact.py deploy
+
+clear-config:; rm interact_config.json

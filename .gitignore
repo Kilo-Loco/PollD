@@ -12,3 +12,6 @@ docs/
 
 # Dotenv file
 .env
+
+# Local configs
+interact_config.json

@@ -126,6 +126,12 @@ $ make create-poll
 $ make vote
 ```
 
+PollD creates a config file for storing both the `contract_address` and `rpc_url`which are fields required for most interactions with the dApp. If you need to clear the config, run the following command:
+
+```shell
+$ make clear-config
+```
+
 <details>
 <summary>Interact using Foundry</summary>
 
