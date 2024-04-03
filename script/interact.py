@@ -3,17 +3,29 @@ import subprocess
 import shlex
 import json
 
+def require_contract_address(subparser):
+    subparser.add_argument('contract_address', nargs='?', help='Contract address')
+
 def request_contract_address(args):
     return args.contract_address if args.contract_address else input("Enter the contract address: ")
 
-def request_poll_id(args):
-    return args.poll_id if args.poll_id else input("Enter the poll ID: ")
+def require_rpc_url(subparser):
+    subparser.add_argument('rpc_url', nargs='?', help='RPC URL')
 
 def request_rpc_url(args):
     return args.rpc_url if args.rpc_url else input("Enter the RPC URL: ")
 
+def require_erc_2335_key(subparser):
+    subparser.add_argument('erc_2335_key', nargs='?', help='ERC-2335 key')
+
 def request_erc_2335_key(args):
     return args.erc_2335_key if args.erc_2335_key else input("Enter the ERC-2335 key: ")
+
+def require_poll_id(subparser):
+    subparser.add_argument('poll_id', nargs='?', type=int, help='Poll ID')
+
+def request_poll_id(args):
+    return args.poll_id if args.poll_id else input("Enter the poll ID: ")
 
 def get_poll_count(args):
     contract_address = request_contract_address(args)
@@ -109,37 +121,38 @@ def main():
 
     # get-poll-count with optional arguments
     get_poll_count_parser = subparsers.add_parser('get-poll-count', help='Returns the total amount of polls and the last PollID used')
-    get_poll_count_parser.add_argument('contract_address', nargs='?', help='Contract address')
-    get_poll_count_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
+    require_contract_address(get_poll_count_parser)
+    require_rpc_url(get_poll_count_parser)
     get_poll_count_parser.set_defaults(func=get_poll_count)
 
     # get-poll with optional arguments
     get_poll_parser = subparsers.add_parser('get-poll', help='Get details of a poll')
-    get_poll_parser.add_argument('contract_address', nargs='?', help='Contract address')
-    get_poll_parser.add_argument('poll_id', nargs='?', type=int, help='Poll ID')
-    get_poll_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
+    require_contract_address(get_poll_parser)
+    require_rpc_url(get_poll_parser)
+    require_poll_id(get_poll_parser)
     get_poll_parser.set_defaults(func=get_poll)
 
     # create-poll with optional arguments
     create_poll_parser = subparsers.add_parser('create-poll', help='Create a new poll')
-    create_poll_parser.add_argument('contract_address', nargs='?', help='Contract address')
+    require_contract_address(create_poll_parser)
+    require_rpc_url(create_poll_parser)
+    require_erc_2335_key(create_poll_parser)
     create_poll_parser.add_argument('question', nargs='?', help='Poll question')
-    create_poll_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
-    create_poll_parser.add_argument('erc_2335_key', nargs='?', help='ERC-2335 key')
     create_poll_parser.set_defaults(func=create_poll)
 
     # vote with optional arguments
     vote_parser = subparsers.add_parser('vote', help='Vote on a poll')
-    vote_parser.add_argument('contract_address', nargs='?', help='Contract address')
-    vote_parser.add_argument('poll_id', nargs='?', type=int, help='Poll ID')
+    require_contract_address(vote_parser.add_argument)
+    require_rpc_url(vote_parser)
+    require_erc_2335_key(vote_parser)
+    require_poll_id(vote_parser)
     vote_parser.add_argument('choice', nargs='?', type=int, help='Your vote (1 for yes, 0 for no)')
-    vote_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
-    vote_parser.add_argument('erc_2335_key', nargs='?', help='ERC-2335 key')
     vote_parser.set_defaults(func=vote)
 
+    # deploy with optional arguments
     deploy_parser = subparsers.add_parser('deploy', help='Deploy the DApp')
-    deploy_parser.add_argument('rpc_url', nargs='?', help='RPC URL')
-    deploy_parser.add_argument('erc_2335_key', nargs='?', help='ERC-2335 key')
+    require_rpc_url(deploy_parser)
+    require_erc_2335_key(deploy_parser)
     deploy_parser.add_argument('wallet_address', nargs='?', help='Wallet address')
     deploy_parser.set_defaults(func=deploy)
 
