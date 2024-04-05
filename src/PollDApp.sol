@@ -8,6 +8,7 @@ contract PollDApp {
     error InvalidPoll();
     error InvalidPollOption();
     error CannotVoteAgain();
+    error PollClosed();
 
     uint private s_pollCount;
     mapping(uint => Poll) private s_polls;
@@ -38,6 +39,7 @@ contract PollDApp {
             poll.id,
             poll.creator,
             poll.question,
+            poll.expDate,
             options
         );
         return response;
@@ -45,7 +47,8 @@ contract PollDApp {
 
     function createPoll(
         string memory _question,
-        string[] memory _options
+        string[] memory _options,
+        uint _expDate
     ) external {
         if (_options.length < 2) {
             revert InvalidOptionCount();
@@ -59,6 +62,7 @@ contract PollDApp {
         newPoll.creator = msg.sender;
         newPoll.question = _question;
         newPoll.optionCount = _options.length;
+        newPoll.expDate = _expDate;
 
         for (uint i = 0; i < _options.length; i++) {
             PollOption memory _newPollOption = PollOption(
@@ -75,14 +79,18 @@ contract PollDApp {
         uint _pollId,
         uint _optionIndex
     ) external validatePoll(_pollId) {
-        if (_optionIndex >= s_polls[_pollId].optionCount) {
+        Poll storage poll = s_polls[_pollId];
+        if (poll.expDate != 0 && poll.expDate < block.timestamp) {
+            revert PollClosed();
+        }
+        if (_optionIndex >= poll.optionCount) {
             revert InvalidPollOption();
         }
-        if (s_polls[_pollId].addressDidVoteMap[msg.sender]) {
+        if (poll.addressDidVoteMap[msg.sender]) {
             revert CannotVoteAgain();
         }
 
-        s_polls[_pollId].options[_optionIndex].voteCount++;
-        s_polls[_pollId].addressDidVoteMap[msg.sender] = true;
+        poll.options[_optionIndex].voteCount++;
+        poll.addressDidVoteMap[msg.sender] = true;
     }
 }
