@@ -69,7 +69,7 @@ $ forge build
 ### Test
 
 ```shell
-$ make test
+$ make tests
 ```
 
 <details>
