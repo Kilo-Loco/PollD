@@ -13,6 +13,7 @@ struct Poll {
     address creator;
     string question;
     uint optionCount;
+    uint expDate;
     mapping(uint => PollOption) options;
     mapping(address => bool) addressDidVoteMap;
 }
@@ -21,5 +22,6 @@ struct PollResponse {
     uint id;
     address creator;
     string question;
+    uint expDate;
     PollOption[] options;
 }

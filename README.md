@@ -29,6 +29,7 @@ struct PollResponse {
     uint id;
     address creator;
     string question;
+    uint expDate;
     PollOption[] options;
 }
 ```

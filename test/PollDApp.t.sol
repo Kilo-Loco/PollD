@@ -16,7 +16,7 @@ contract PollDAppTest is Test {
         string[] memory options = new string[](2);
         options[0] = "yes";
         options[1] = "no";
-        app.createPoll("Do you code?", options);
+        app.createPoll("Do you code?", options, 0);
         _;
     }
 
@@ -29,7 +29,7 @@ contract PollDAppTest is Test {
         options[0] = "yes";
 
         vm.expectRevert(PollDApp.InvalidOptionCount.selector);
-        app.createPoll("Do you code?", options);
+        app.createPoll("Do you code?", options, 0);
     }
 
     function testGetPoll() public hasExistingPoll {
@@ -62,5 +62,36 @@ contract PollDAppTest is Test {
 
         vm.expectRevert(PollDApp.CannotVoteAgain.selector);
         app.vote(pollId, 1);
+    }
+
+    function testCannotVoteOnClosedPoll() public {
+        string[] memory options = new string[](2);
+        options[0] = "yes";
+        options[1] = "no";
+        uint expDate = 1;
+        app.createPoll("Do you code?", options, expDate);
+
+        uint pollId = 1;
+        uint optionIndex = 0;
+        skip(300);
+
+        vm.expectRevert(PollDApp.PollClosed.selector);
+        app.vote(pollId, optionIndex);
+    }
+
+    function testCanVoteOnOpenPoll() public {
+        uint timestamp = 300;
+        string[] memory options = new string[](2);
+        options[0] = "yes";
+        options[1] = "no";
+        uint expDate = timestamp;
+        app.createPoll("Do you code?", options, expDate);
+
+        uint pollId = 1;
+        uint optionIndex = 0;
+        skip(timestamp + 5);
+
+        vm.expectRevert(PollDApp.PollClosed.selector);
+        app.vote(pollId, optionIndex);
     }
 }
