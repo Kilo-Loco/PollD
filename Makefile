@@ -4,7 +4,7 @@ start:; foundryup
 
 build:; forge build
 
-test:; forge test
+tests:; forge test
 
 local-chain:; anvil
 
