@@ -46,8 +46,8 @@ contract PollDApp {
     }
 
     function createPoll(
-        string memory _question,
-        string[] memory _options,
+        string calldata _question,
+        string[] calldata _options,
         uint _expDate
     ) external {
         if (_options.length < 2) {
