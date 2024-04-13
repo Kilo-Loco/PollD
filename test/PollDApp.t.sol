@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {PollDApp} from "../src/PollDApp.sol";
-import {Poll, PollOption, PollResponse} from "../src/Models.sol";
+import {Poll, PollOption, PollDetails} from "../src/Models.sol";
 
 contract PollDAppTest is Test {
     PollDApp public app;
@@ -35,10 +35,10 @@ contract PollDAppTest is Test {
     function testGetPoll() public hasExistingPoll {
         uint pollId = 1;
 
-        PollResponse memory response = app.getPoll(pollId);
+        PollDetails memory details = app.getPoll(pollId);
 
-        assertEq(response.id, pollId, "Expected PollIDs to match.");
-        assertEq(response.options.length, 2, "Expected poll count to be 2.");
+        assertEq(details.id, pollId, "Expected PollIDs to match.");
+        assertEq(details.options.length, 2, "Expected poll count to be 2.");
     }
 
     function testGetPollMustExist() public {
