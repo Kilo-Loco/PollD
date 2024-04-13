@@ -18,7 +18,7 @@ struct Poll {
     mapping(address => bool) addressDidVoteMap;
 }
 
-struct PollResponse {
+struct PollDetails {
     uint id;
     address creator;
     string question;

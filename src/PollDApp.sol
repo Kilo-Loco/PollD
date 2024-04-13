@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {Poll, PollOption, PollResponse} from "./Models.sol";
+import {Poll, PollOption, PollDetails} from "./Models.sol";
 
 contract PollDApp {
     error InvalidOptionCount();
@@ -26,7 +26,7 @@ contract PollDApp {
 
     function getPoll(
         uint _pollId
-    ) external view validatePoll(_pollId) returns (PollResponse memory) {
+    ) external view validatePoll(_pollId) returns (PollDetails memory) {
         Poll storage poll = s_polls[_pollId];
 
         PollOption[] memory options = new PollOption[](
@@ -35,14 +35,14 @@ contract PollDApp {
         for (uint i = 0; i < s_polls[_pollId].optionCount; i++) {
             options[i] = s_polls[_pollId].options[i];
         }
-        PollResponse memory response = PollResponse(
+        PollDetails memory details = PollDetails(
             poll.id,
             poll.creator,
             poll.question,
             poll.expDate,
             options
         );
-        return response;
+        return details;
     }
 
     function createPoll(

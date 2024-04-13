@@ -8,14 +8,14 @@ You can interact with the `PollDApp` smart contract using the following function
 
 ### Call
 - `getPollCount()`: Returns the total amount of polls and the last PollID used.
-- `getPoll(uint)(PollResponse)`: Get relevant information of a Poll by its ID.
+- `getPoll(uint)(PollDetails)`: Get relevant information of a Poll by its ID.
 
 ### Send
 - `createPoll(string,string[])`: Creates a Poll given the question and an array of options to choose from.
 - `vote(uint256,uint256)`: Allows a user to vote given the PollID and the option index.
 
 <details>
-<summary>Response Structures</summary>
+<summary>Structures</summary>
 
 ```solidity
 struct PollOption {
@@ -25,7 +25,7 @@ struct PollOption {
     uint voteCount;
 }
 
-struct PollResponse {
+struct PollDetails {
     uint id;
     address creator;
     string question;
