@@ -5,20 +5,6 @@ from dotenv  import load_dotenv
 from pathlib import Path
 from web3 import Web3
 
-# if 'poll_count' not in st.session_state:
-#     st.session_state["poll_count"] = 0
-
-# def handle_click(amount):
-#     st.session_state["poll_count"] = amount
-
-# st.write(st.session_state.poll_count)
-
-# with st.form("poll_count_form"):
-#     async_value = 0
-#     st.form_submit_button("Set Poll Count",  on_click=handle_click, args=async_value)
-#     async_value = st.number_input("Provide async amount", step=1)
-
-
 load_dotenv()
 
 w3 = Web3(Web3.HTTPProvider(os.getenv("WEB3_PROVIDER_URI")))
@@ -58,7 +44,7 @@ with st.form("create_poll_form"):
     st.divider()
 
     if st.form_submit_button("Create Poll"):
-        wallet_address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        wallet_address = os.getenv("WALLET_ADDRESS")
         tx = contract.functions.createPoll(
             question,
             [option1, option2],
@@ -69,7 +55,7 @@ with st.form("create_poll_form"):
         })
         signed_tx = w3.eth.account.sign_transaction(
             tx, 
-            private_key="0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+            private_key=os.getenv("WALLET_PRIVATE_KEY")
         )
         tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
         w3.eth.wait_for_transaction_receipt(tx_hash)
