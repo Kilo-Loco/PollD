@@ -45,6 +45,23 @@ contract PollDApp {
         return details;
     }
 
+    function getPolls(uint _index, uint _pollsPerPage) external returns (PollDetails[] memory) {
+
+        // TODO: Include looping over polls based on index
+
+        if (s_pollCount == 0) {
+            return new PollDetails[](0);
+        } else if (s_pollCount <= _pollsPerPage) {
+            PollDetails[] memory _polls = new PollDetails[](s_pollCount);
+
+            return _polls
+        } else {
+            PollDetails[] memory _polls = new PollDetails[](_pollsPerPage);
+
+            return _polls;
+        }
+    }
+
     function createPoll(
         string calldata _question,
         string[] calldata _options,
