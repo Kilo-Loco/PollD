@@ -11,17 +11,13 @@ w3 = Web3(Web3.HTTPProvider(os.getenv("WEB3_PROVIDER_URI")))
 
 @st.cache_resource
 def load_contract():
-
     with open(Path('./abi/PollDAppABI.json')) as f:
         abi = json.load(f)
-
     contract_address = os.getenv("SMART_CONTRACT_ADDRESS")
-
     contract = w3.eth.contract(
         address=w3.to_checksum_address(contract_address),
         abi=abi
     )
-
     return contract
 
 contract = load_contract()
@@ -31,23 +27,36 @@ if 'poll_count' not in st.session_state:
 
 def refresh_poll_count():
     st.session_state['poll_count'] = contract.functions.getPollCount().call()
-    st.experimental_rerun()
+
+def add_field():
+    st.session_state['option_count'] += 1
 
 st.title("PollD")
 st.text(f"Total Polls: {st.session_state.poll_count}")
 
 with st.form("create_poll_form"):
     question = st.text_input("Enter your poll question...")
+
     st.divider()
-    option1 = st.text_input("Option 1")
-    option2 = st.text_input("Option 2")
+
+    if 'option_count' not in st.session_state:
+        st.session_state['option_count'] = 1
+    for i in range(st.session_state['option_count']):
+        st.text_input(f"Option {i+1}", key=f"option_{i+1}")
+    st.form_submit_button("Add another field", on_click=add_field)
+
     st.divider()
 
     if st.form_submit_button("Create Poll"):
         wallet_address = os.getenv("WALLET_ADDRESS")
+
+        options = []
+        for i in range(st.session_state['option_count']):
+            options.append(st.session_state[f"option_{i+1}"])
+
         tx = contract.functions.createPoll(
             question,
-            [option1, option2],
+            options,
             0
         ).build_transaction({
             "from": wallet_address,
