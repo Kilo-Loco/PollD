@@ -26,7 +26,7 @@ contract PollDApp {
 
     function getPoll(
         uint _pollId
-    ) external view validatePoll(_pollId) returns (PollDetails memory) {
+    ) public view validatePoll(_pollId) returns (PollDetails memory) {
         Poll storage poll = s_polls[_pollId];
 
         PollOption[] memory options = new PollOption[](
@@ -43,6 +43,40 @@ contract PollDApp {
             options
         );
         return details;
+    }
+
+    function getPolls(
+        uint _index,
+        uint _pollsPerPage
+    ) external view returns (PollDetails[] memory) {
+        if (s_pollCount == 0 || (_index * _pollsPerPage) > s_pollCount) {
+            return new PollDetails[](0);
+        } else if (s_pollCount <= _pollsPerPage) {
+            PollDetails[] memory pollDetails = new PollDetails[](s_pollCount);
+            uint i = 0;
+            for (uint j = s_pollCount; j > 0; j--) {
+                pollDetails[i] = getPoll(j);
+                i++;
+            }
+            return pollDetails;
+        } else {
+            uint startIndex = s_pollCount - (_index * _pollsPerPage);
+            uint totalPages = s_pollCount / _pollsPerPage;
+            uint endIndex = (_index < totalPages)
+                ? (startIndex - _pollsPerPage)
+                : (startIndex - (s_pollCount % _pollsPerPage));
+
+            uint totalPolls = startIndex - endIndex;
+            PollDetails[] memory pollDetails = new PollDetails[](totalPolls);
+
+            uint i = 0;
+            for (uint j = startIndex; j > endIndex; j--) {
+                pollDetails[i] = getPoll(j);
+                i++;
+            }
+
+            return pollDetails;
+        }
     }
 
     function createPoll(

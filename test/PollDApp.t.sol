@@ -20,6 +20,17 @@ contract PollDAppTest is Test {
         _;
     }
 
+    modifier hasManyPolls(uint _pollCount) {
+        string[] memory options = new string[](2);
+        options[0] = "yes";
+        options[1] = "no";
+
+        for (uint i = 0; i < _pollCount; i++) {
+            app.createPoll("Do you code?", options, 0);
+        }
+        _;
+    }
+
     function testCreatePoll() public hasExistingPoll {
         assertEq(app.getPollCount(), 1, "Expected pollCount to increase to 1");
     }
@@ -44,6 +55,61 @@ contract PollDAppTest is Test {
     function testGetPollMustExist() public {
         vm.expectRevert(PollDApp.InvalidPoll.selector);
         app.getPoll(5);
+    }
+
+    function testGetPollsWithExistingPoll() public hasExistingPoll {
+        PollDetails[] memory arr = app.getPolls(0, 3);
+        assertEq(
+            arr.length,
+            1,
+            "Expected an array of PollDetails with 1 item."
+        );
+    }
+
+    function testGetPollsWithoutExistingPoll() public view {
+        PollDetails[] memory arr = app.getPolls(0, 3);
+        assertEq(
+            arr.length,
+            0,
+            "Expected an array of PollDetails with 1 item."
+        );
+    }
+
+    function testNoPollsAtIndexHigherThanPollCount() public hasExistingPoll {
+        PollDetails[] memory arr = app.getPolls(123, 3);
+        assertEq(
+            arr.length,
+            0,
+            "Expected an array of PollDetails with 1 item."
+        );
+    }
+
+    function testGetPollsAtNextIndex() public hasManyPolls(10) {
+        uint pollsPerPage = 3;
+        PollDetails[] memory arr = app.getPolls(1, pollsPerPage);
+        assertEq(arr.length, pollsPerPage, "Expected a full page of polls.");
+    }
+
+    function testGetPollsAtLastIndex() public hasManyPolls(10) {
+        // This number must match the amount passed to hasManyPolls
+        uint pollsCreated = 10;
+        uint pollsPerPage = 3;
+        uint pollCountForLastPage = pollsCreated % pollsPerPage;
+        PollDetails[] memory arr = app.getPolls(3, pollsPerPage);
+        assertEq(
+            arr.length,
+            pollCountForLastPage,
+            "Expected remaining amount of polls."
+        );
+    }
+
+    function testGetPollsReturnInDescendingOrder() public hasManyPolls(3) {
+        // This number must match the amount passed to hasManyPolls
+        uint pollsCreated = 3;
+        PollDetails[] memory arr = app.getPolls(0, pollsCreated);
+        assertEq(arr[0].id, 3, "First poll should be id 3");
+        assertEq(arr[1].id, 2, "Second poll should be id 2");
+        assertEq(arr[2].id, 1, "Last poll should be id 1");
     }
 
     function testCannotVoteOnFuturePoll() public {
