@@ -47,6 +47,28 @@ with st.form("create_poll_form"):
 
     st.divider()
 
+    html_code = """
+    <button onclick="connectWallet()">Connect to MetaMask</button>
+    <p id="status"></p>
+    <script>
+    async function connectWallet() {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                document.getElementById('status').innerText = 'Connected: ' + accounts[0];
+                // Add more JavaScript here to handle transactions
+            } catch (error) {
+                document.getElementById('status').innerText = 'Error connecting: ' + error.message;
+            }
+        } else {
+            document.getElementById('status').innerText = 'MetaMask is not available.';
+        }
+    }
+    </script>
+    """
+
+    st.markdown(html_code, unsafe_allow_html=True)
+
     if st.form_submit_button("Create Poll"):
         wallet_address = os.getenv("WALLET_ADDRESS")
 
